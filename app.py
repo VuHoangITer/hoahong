@@ -66,7 +66,7 @@ def index():
             if approved and 'gift_value' in request.form:
                 gift_value = int(request.form['gift_value'])
                 fund = (after_gift_price - G) * total_qty
-                base_commission = 8000 if product == "KDG XÁM PHỔ THÔNG" else 0
+                base_commission = 8000 if product == "KDG XÁM PHỔ THÔNG" else 15000
                 company_commission = base_commission * sell_qty
                 bonus = fund - gift_value
                 total_commission = bonus + company_commission
