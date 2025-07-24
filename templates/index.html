@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Web Tính Hoa Hồng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <script>
+    function updateAfterGiftPrice() {
+      const sellQty = parseInt(document.getElementById('sell_qty').value) || 0;
+      const giftQty = parseInt(document.getElementById('gift_qty').value) || 0;
+      const product = document.getElementById('product').value;
+
+      let D = 0;
+      if (product === "KDG XÁM PHỔ THÔNG") D = 195000;
+      else if (product === "KDG TRẮNG PHỔ THÔNG") D = 250000;
+
+      const total = sellQty + giftQty;
+      if (giftQty > 0 && total > 0) {
+        const afterGift = (D * sellQty) / total;
+        document.getElementById('after_gift_box').innerText = Math.floor(afterGift).toLocaleString("vi-VN") + ' VND';
+        document.getElementById('after_gift_container').classList.remove("hidden");
+      } else {
+        document.getElementById('after_gift_container').classList.add("hidden");
+      }
+    }
+
+    window.onload = updateAfterGiftPrice;
+  </script>
+</head>
+<body class="bg-[#f9f8f6] min-h-screen flex items-start justify-center p-6">
+  <main class="max-w-md w-full">
+    <h1 class="text-4xl font-semibold text-[#1f2429] mb-6 font-sans text-center">Web Tính Hoa Hồng</h1>
+
+    <form method="post" class="space-y-3 text-[#1f2429] font-sans text-lg">
+      <select
+        id="product"
+        name="product"
+        onchange="updateAfterGiftPrice()"
+        class="w-full border border-gray-300 rounded-md px-4 py-2 bg-white"
+      >
+        <option value="KDG XÁM PHỔ THÔNG" {% if result and result.product == "KDG XÁM PHỔ THÔNG" %}selected{% endif %}>KDG XÁM PHỔ THÔNG</option>
+        <option value="KDG TRẮNG PHỔ THÔNG" {% if result and result.product == "KDG TRẮNG PHỔ THÔNG" %}selected{% endif %}>KDG TRẮNG PHỔ THÔNG</option>
+      </select>
+
+      <input
+        type="number"
+        name="sell_qty"
+        id="sell_qty"
+        placeholder="Số lượng bán"
+        required
+        min="10"
+        oninput="updateAfterGiftPrice()"
+        value="{{ result.sell_qty if result else '' }}"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+
+      <input
+        type="number"
+        name="gift_qty"
+        id="gift_qty"
+        placeholder="Số lượng tặng"
+        required
+        oninput="updateAfterGiftPrice()"
+        value="{{ result.gift_qty if result else '' }}"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+
+      <div id="after_gift_container" class="hidden flex justify-between items-center text-lg">
+        <span>Giá sau tặng:</span>
+        <span id="after_gift_box" class="font-semibold text-xl text-[#1f2429]"></span>
+      </div>
+
+      <button type="submit" class="w-full bg-[#2c6cb5] text-white text-lg py-2 rounded-md">Check</button>
+    </form>
+
+    {% if result %}
+    <hr class="border-t border-gray-300 my-5" />
+    <div class="text-[#1f2429] font-sans text-lg font-normal">
+      <p>Quyết định của sếp:</p>
+      <p class="flex items-center space-x-2 mt-1 font-semibold text-xl">
+        {% if result.approved %}
+          <i class="fas fa-check text-green-700"></i><span>DUYỆT</span>
+        {% else %}
+          <i class="fas fa-times text-red-600"></i><span>KHÔNG DUYỆT</span>
+        {% endif %}
+      </p>
+    </div>
+
+    {% if result.approved %}
+    <div class="bg-[#fff4d9] border border-[#ffe8a1] rounded-md p-4 mt-3">
+      <p>Quỹ quà tặng:</p>
+      <p class="mt-1 font-semibold">
+        {{ "{:,}".format(
+            result.commission_data.fund | int if result.commission_data
+            else ((result.after_gift_price - result.G) * (result.sell_qty + result.gift_qty) | int)
+        ) }} VND
+      </p>
+    </div>
+
+    <form method="post" class="mt-4 space-y-3">
+      <input type="hidden" name="product" value="{{ result.product }}">
+      <input type="hidden" name="sell_qty" value="{{ result.sell_qty }}">
+      <input type="hidden" name="gift_qty" value="{{ result.gift_qty }}">
+
+      <input
+        type="number"
+        name="gift_value"
+        required
+        placeholder="Giá trị quà muốn tặng"
+        class="w-full border border-gray-300 rounded-md px-4 py-2"
+      />
+
+      <button type="submit" class="w-full bg-[#2c6cb5] text-white text-lg py-2 rounded-md">Tính hoa hồng</button>
+    </form>
+
+    {% if result.commission_data %}
+    <div class="bg-[#fff4d9] border border-[#ffe8a1] rounded-md p-4 mt-3">
+      <p>Tổng hoa hồng:</p>
+      <p class="mt-1 font-semibold">
+        {{ "{:,}".format(result.commission_data.total_commission | int) }} VND
+      </p>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+
+    <div class="flex justify-center mt-5">
+      <a href="/">
+        <button type="button" class="bg-gray-400 text-white text-lg py-2 px-6 rounded-md">Reset</button>
+      </a>
+    </div>
+  </main>
+</body>
+</html>

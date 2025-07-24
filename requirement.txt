@@ -1,0 +1,6 @@
+flask
+gunicorn
+pandas
+numpy
+werkzeug==2.3.6
+openpyxl==3.1.2
