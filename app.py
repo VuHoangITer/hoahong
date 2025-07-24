@@ -50,7 +50,7 @@ def index():
 
         if total_qty > 0:
             after_gift_price = (D * sell_qty) / total_qty
-            approved = after_gift_price > G
+            approved = after_gift_price >= G
 
             result = {
                 'product': product,
