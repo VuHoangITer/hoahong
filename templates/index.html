@@ -4,134 +4,393 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Web Tính Hoa Hồng</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-  />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0;
+      padding: 20px;
+      color: #2d3748;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    main {
+      max-width: 900px;
+      width: 100%;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 6px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+    }
+    h1 {
+      text-align: center;
+      color: #2b6cb0;
+      margin-bottom: 35px;
+      font-size: 2.5em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      position: relative;
+    }
+    h1::after {
+      content: '';
+      width: 50px;
+      height: 3px;
+      background: #2b6cb0;
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+    .product-entry {
+      background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-entry:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    select, input[type="number"] {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 15px;
+      border: 2px solid #edf2f7;
+      border-radius: 8px;
+      font-size: 1em;
+      background: #ffffff;
+      transition: all 0.3s ease;
+      color: #2d3748;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+      background: #f7fafc;
+    }
+    button {
+      padding: 16px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      margin: 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .button-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+    button[type="button"] {
+      background: linear-gradient(90deg, #4a5568, #2d3748);
+      color: #fff;
+    }
+    button[type="button"]:hover {
+      background: linear-gradient(90deg, #2d3748, #4a5568);
+      transform: translateY(-2px);
+    }
+    .remove-btn {
+      background: linear-gradient(90deg, #e53e3e, #c53030);
+      color: #fff;
+    }
+    .remove-btn:hover {
+      background: linear-gradient(90deg, #c53030, #e53e3e);
+      transform: translateY(-2px);
+    }
+    button[type="submit"] {
+      background: linear-gradient(90deg, #2b6cb0, #4a90e2);
+      color: #fff;
+      width: 100%;
+      margin-top: 20px;
+    }
+    button[type="submit"]:hover {
+      background: linear-gradient(90deg, #4a90e2, #2b6cb0);
+      transform: translateY(-2px);
+    }
+    #add-product-btn {
+      background: linear-gradient(90deg, #38b2ac, #319795);
+      color: #fff;
+      width: 100%;
+      margin-top: 20px;
+    }
+    #add-product-btn:hover {
+      background: linear-gradient(90deg, #319795, #38b2ac);
+      transform: translateY(-2px);
+    }
+    #after_gift_container {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      margin-top: 15px;
+      font-size: 0.95em;
+      color: #4a5568;
+      background: #f7fafc;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    #after_gift_box {
+      font-weight: 600;
+      color: #2b6cb0;
+    }
+    .result-section {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #e6f0fa 0%, #f0f4f8 100%);
+      border: 1px solid #e2e8f0;
+    }
+    .result-section p {
+      margin: 8px 0;
+      font-size: 1.1em;
+    }
+    .error {
+      color: #e53e3e;
+      font-weight: 600;
+      text-align: center;
+      background: #fef2f2;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .approved {
+      color: #48bb78;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .not-approved {
+      color: #e53e3e;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    hr {
+      border: none;
+      border-top: 2px dashed #e2e8f0;
+      margin: 25px 0;
+    }
+    .reset-btn {
+      display: block;
+      width: 180px;
+      margin: 25px auto;
+      text-align: center;
+    }
+    .reset-btn button {
+      background: linear-gradient(90deg, #a0aec0, #718096);
+      color: #fff;
+    }
+    .reset-btn button:hover {
+      background: linear-gradient(90deg, #718096, #a0aec0);
+      transform: translateY(-2px);
+    }
+    @media (max-width: 600px) {
+      main {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+      .button-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+      button {
+        width: 100%;
+      }
+      #add-product-btn {
+        margin-top: 15px;
+      }
+    }
+  </style>
   <script>
-    function updateAfterGiftPrice() {
-      const sellQty = parseInt(document.getElementById('sell_qty').value) || 0;
-      const giftQty = parseInt(document.getElementById('gift_qty').value) || 0;
-      const product = document.getElementById('product').value;
+    function updateAfterGiftPrice(index) {
+      const sellQty = parseInt(document.getElementsByName('sell_qty[]')[index].value) || 0;
+      const giftQty = parseInt(document.getElementsByName('gift_qty[]')[index].value) || 0;
+      const product = document.getElementsByName('product[]')[index].value;
+      const afterGiftBox = document.getElementById(`after_gift_box_${index}`);
+      const afterGiftContainer = document.getElementById(`after_gift_container_${index}`);
+      const sellInput = document.getElementsByName('sell_qty[]')[index];
+
+      // Set minimum quantity based on product
+      if (product.includes("KCR")) {
+        sellInput.setAttribute('min', '5');
+      } else {
+        sellInput.setAttribute('min', '10');
+      }
 
       let D = 0;
       if (product === "KDG XÁM PHỔ THÔNG") D = 195000;
       else if (product === "KDG TRẮNG PHỔ THÔNG") D = 250000;
+      else if (product === "KDG XÁM EXTRA") D = 295000;
+      else if (product === "KDG TRẮNG EXTRA") D = 350000;
+      else if (product === "KCR TRẮNG PHỔ THÔNG (BỊCH)") D = 336000;
+      else if (product === "KCR TRẮNG EXTRA (BỊCH)") D = 408000;
+      else if (product === "KCR TRẮNG HỘP") D = 484000;
 
       const total = sellQty + giftQty;
       if (giftQty > 0 && total > 0) {
         const afterGift = (D * sellQty) / total;
-        document.getElementById('after_gift_box').innerText = Math.floor(afterGift).toLocaleString("vi-VN") + ' VND';
-        document.getElementById('after_gift_container').classList.remove("hidden");
+        afterGiftBox.innerText = Math.floor(afterGift).toLocaleString("vi-VN") + ' VND';
+        afterGiftContainer.style.display = 'flex';
       } else {
-        document.getElementById('after_gift_container').classList.add("hidden");
+        afterGiftContainer.style.display = 'none';
       }
     }
 
-    window.onload = updateAfterGiftPrice;
+    function addProductEntry() {
+      const container = document.getElementById('product_entries');
+      const index = container.children.length;
+      const entry = document.createElement('div');
+      entry.className = 'product-entry';
+      entry.innerHTML = `
+        <div>
+          <select name="product[]" onchange="updateAfterGiftPrice(${index})">
+            <option value="KDG XÁM PHỔ THÔNG">KDG XÁM PHỔ THÔNG</option>
+            <option value="KDG TRẮNG PHỔ THÔNG">KDG TRẮNG PHỔ THÔNG</option>
+            <option value="KDG XÁM EXTRA">KDG XÁM EXTRA</option>
+            <option value="KDG TRẮNG EXTRA">KDG TRẮNG EXTRA</option>
+            <option value="KCR TRẮNG PHỔ THÔNG (BỊCH)">KCR TRẮNG PHỔ THÔNG (BỊCH)</option>
+            <option value="KCR TRẮNG EXTRA (BỊCH)">KCR TRẮNG EXTRA (BỊCH)</option>
+            <option value="KCR TRẮNG HỘP">KCR TRẮNG HỘP</option>
+          </select>
+        </div>
+        <div>
+          <input
+            type="number"
+            name="sell_qty[]"
+            placeholder="Số lượng bán"
+            required
+            min="10"
+            oninput="updateAfterGiftPrice(${index})"
+          />
+        </div>
+        <div>
+          <input
+            type="number"
+            name="gift_qty[]"
+            placeholder="Số lượng tặng"
+            required
+            oninput="updateAfterGiftPrice(${index})"
+          />
+        </div>
+        <div id="after_gift_container_${index}" style="display: none;">
+          <span>Giá sau tặng:</span>
+          <span id="after_gift_box_${index}"></span>
+        </div>
+        <div class="button-group">
+          <button type="button" class="remove-btn" onclick="removeProductEntry(this)">Xóa</button>
+        </div>
+      `;
+      container.appendChild(entry);
+    }
+
+    function removeProductEntry(button) {
+      button.parentElement.parentElement.remove();
+      const entries = document.getElementsByClassName('product-entry');
+      for (let i = 0; i < entries.length; i++) {
+        const select = entries[i].querySelector('select');
+        const sellInput = entries[i].querySelector('input[name="sell_qty[]"]');
+        const giftInput = entries[i].querySelector('input[name="gift_qty[]"]');
+        select.setAttribute('onchange', `updateAfterGiftPrice(${i})`);
+        sellInput.setAttribute('oninput', `updateAfterGiftPrice(${i})`);
+        giftInput.setAttribute('oninput', `updateAfterGiftPrice(${i})`);
+        entries[i].querySelector(`#after_gift_container_${i}`)?.setAttribute('id', `after_gift_container_${i}`);
+        entries[i].querySelector(`#after_gift_box_${i}`)?.setAttribute('id', `after_gift_box_${i}`);
+      }
+      if (entries.length === 0) addProductEntry();
+    }
+
+    window.onload = function() {
+      addProductEntry();
+    };
   </script>
 </head>
-<body class="bg-[#f9f8f6] min-h-screen flex items-start justify-center p-6">
-  <main class="max-w-md w-full">
-    <h1 class="text-4xl font-semibold text-[#1f2429] mb-6 font-sans text-center">Web Tính Hoa Hồng</h1>
+<body>
+  <main>
+    <h1>Web Tính Hoa Hồng</h1>
 
-    <form method="post" class="space-y-3 text-[#1f2429] font-sans text-lg">
-      <select
-        id="product"
-        name="product"
-        onchange="updateAfterGiftPrice()"
-        class="w-full border border-gray-300 rounded-md px-4 py-2 bg-white"
-      >
-        <option value="KDG XÁM PHỔ THÔNG" {% if result and result.product == "KDG XÁM PHỔ THÔNG" %}selected{% endif %}>KDG XÁM PHỔ THÔNG</option>
-        <option value="KDG TRẮNG PHỔ THÔNG" {% if result and result.product == "KDG TRẮNG PHỔ THÔNG" %}selected{% endif %}>KDG TRẮNG PHỔ THÔNG</option>
-      </select>
-
-      <input
-        type="number"
-        name="sell_qty"
-        id="sell_qty"
-        placeholder="Số lượng bán"
-        required
-        min="10"
-        oninput="updateAfterGiftPrice()"
-        value="{{ result.sell_qty if result else '' }}"
-        class="w-full border border-gray-300 rounded-md px-4 py-2"
-      />
-
-      <input
-        type="number"
-        name="gift_qty"
-        id="gift_qty"
-        placeholder="Số lượng tặng"
-        required
-        oninput="updateAfterGiftPrice()"
-        value="{{ result.gift_qty if result else '' }}"
-        class="w-full border border-gray-300 rounded-md px-4 py-2"
-      />
-
-      <div id="after_gift_container" class="hidden flex justify-between items-center text-lg">
-        <span>Giá sau tặng:</span>
-        <span id="after_gift_box" class="font-semibold text-xl text-[#1f2429]"></span>
-      </div>
-
-      <button type="submit" class="w-full bg-[#2c6cb5] text-white text-lg py-2 rounded-md">Check</button>
+    <form method="post">
+      <div id="product_entries"></div>
+      <button type="submit">Check</button>
     </form>
+    <button type="button" id="add-product-btn" onclick="addProductEntry()">Thêm sản phẩm</button>
 
     {% if result %}
-    <hr class="border-t border-gray-300 my-5" />
-    <div class="text-[#1f2429] font-sans text-lg font-normal">
+    <hr />
+    <div class="result-section">
       <p>Quyết định của sếp:</p>
-      <p class="flex items-center space-x-2 mt-1 font-semibold text-xl">
-        {% if result.approved %}
-          <i class="fas fa-check text-green-700"></i><span>DUYỆT</span>
+      <p class="{% if result.approved_all %}approved{% else %}not-approved{% endif %}">
+        {% if result.approved_all %}
+          DUYỆT
         {% else %}
-          <i class="fas fa-times text-red-600"></i><span>KHÔNG DUYỆT</span>
+          KHÔNG DUYỆT
         {% endif %}
       </p>
     </div>
 
-    {% if result.approved %}
-    <div class="bg-[#fff4d9] border border-[#ffe8a1] rounded-md p-4 mt-3">
-      <p>Quỹ quà tặng:</p>
-      <p class="mt-1 font-semibold">
-        {{ "{:,}".format(
-            result.commission_data.fund | int if result.commission_data
-            else ((result.after_gift_price - result.G) * (result.sell_qty + result.gift_qty) | int)
-        ) }} VND
-      </p>
-    </div>
-
-    <form method="post" class="mt-4 space-y-3">
-      <input type="hidden" name="product" value="{{ result.product }}">
-      <input type="hidden" name="sell_qty" value="{{ result.sell_qty }}">
-      <input type="hidden" name="gift_qty" value="{{ result.gift_qty }}">
-
-      <input
-        type="number"
-        name="gift_value"
-        required
-        placeholder="Giá trị quà muốn tặng"
-        class="w-full border border-gray-300 rounded-md px-4 py-2"
-      />
-
-      <button type="submit" class="w-full bg-[#2c6cb5] text-white text-lg py-2 rounded-md">Tính hoa hồng</button>
+    {% if result.approved_all %}
+    <form method="post">
+      {% for product_result in result.products %}
+      <div class="product-entry">
+        <h3>{{ product_result.product }}</h3>
+        <p>Quỹ quà tặng: {{ "{:,}".format(product_result.commission_data.fund | int if product_result.commission_data else ((product_result.after_gift_price - product_result.G) * (product_result.sell_qty + product_result.gift_qty) | int)) }} VND</p>
+        <input type="hidden" name="product[]" value="{{ product_result.product }}">
+        <input type="hidden" name="sell_qty[]" value="{{ product_result.sell_qty }}">
+        <input type="hidden" name="gift_qty[]" value="{{ product_result.gift_qty }}">
+        <input
+          type="number"
+          name="gift_value[]"
+          required
+          placeholder="Giá trị quà muốn tặng cho {{ product_result.product }}"
+        />
+        <div class="button-group">
+          <button type="button" class="remove-btn" onclick="removeProductEntry(this)">Xóa</button>
+        </div>
+      </div>
+      {% endfor %}
+      <br/>
+      <button type="submit">Tính hoa hồng</button>
     </form>
 
-    {% if result.commission_data %}
-    <div class="bg-[#fff4d9] border border-[#ffe8a1] rounded-md p-4 mt-3">
+    {% if result.products[0].commission_data %}
+    <div class="result-section">
       <p>Tổng hoa hồng:</p>
-      <p class="mt-1 font-semibold">
-        {{ "{:,}".format(result.commission_data.total_commission | int) }} VND
-      </p>
+      <p>{{ "{:,}".format(result.total_commission | int) }} VND</p>
     </div>
     {% endif %}
     {% endif %}
     {% endif %}
 
-    <div class="flex justify-center mt-5">
-      <a href="/">
-        <button type="button" class="bg-gray-400 text-white text-lg py-2 px-6 rounded-md">Reset</button>
+    {% if result and result.error %}
+    <div class="error">
+      <p>Lỗi: {{ result.error }}</p>
+    </div>
+    {% endif %}
+
+    <br/>
+    <div>
+      <a href="/" class="reset-btn">
+        <button type="button">Reset</button>
       </a>
     </div>
   </main>
