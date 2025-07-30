@@ -66,7 +66,6 @@ def get_base_commission(product):
 def index():
     result = None
     total_commission = 0
-    approved_all = True
     product_results = []
 
     if request.method == 'POST':
@@ -106,8 +105,6 @@ def index():
             after_gift_price = (D * sell_qty) / total_qty
             approved = after_gift_price >= G
 
-            approved_all = approved_all and approved
-
             product_result = {
                 'product': product,
                 'sell_qty': sell_qty,
@@ -143,8 +140,7 @@ def index():
 
         result = {
             'products': product_results,
-            'total_commission': total_commission,
-            'approved_all': approved_all
+            'total_commission': total_commission
         }
 
     return render_template('index.html', result=result)

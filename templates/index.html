@@ -59,7 +59,6 @@
       position: relative;
       overflow: hidden;
     }
-
     .product-entry:hover {
       transform: translateY(-5px) scale(1.02);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
@@ -328,7 +327,6 @@
 <body>
   <main>
     <h1>Web Tính Hoa Hồng</h1>
-
     <form method="post">
       <div id="product_entries"></div>
       <button type="submit">Check</button>
@@ -337,47 +335,43 @@
 
     {% if result %}
     <hr />
+    {% for product_result in result.products %}
     <div class="result-section">
+      <h3>{{ product_result.product }}</h3>
+      <p>Giá sau tặng: {{ "{:,}".format(product_result.after_gift_price | int) }} VND</p>
       <p>Quyết định của sếp:</p>
-      <p class="{% if result.approved_all %}approved{% else %}not-approved{% endif %}">
-        {% if result.approved_all %}
+      <p class="{% if product_result.approved %}approved{% else %}not-approved{% endif %}">
+        {% if product_result.approved %}
           DUYỆT
         {% else %}
           KHÔNG DUYỆT
         {% endif %}
       </p>
-    </div>
-
-    {% if result.approved_all %}
+    {% endfor %}
+    {% if result.products|selectattr('approved')|list|length > 0 %}
     <form method="post">
-      {% for product_result in result.products %}
-      <div class="product-entry">
+      {% for product_result in result.products if product_result.approved %}
+      <div class="result-section">
         <h3>{{ product_result.product }}</h3>
-        <p>Quỹ quà tặng: {{ "{:,}".format(product_result.commission_data.fund | int if product_result.commission_data else ((product_result.after_gift_price - product_result.G) * (product_result.sell_qty + product_result.gift_qty) | int)) }} VND</p>
         <input type="hidden" name="product[]" value="{{ product_result.product }}">
         <input type="hidden" name="sell_qty[]" value="{{ product_result.sell_qty }}">
         <input type="hidden" name="gift_qty[]" value="{{ product_result.gift_qty }}">
+        <p>Quỹ quà tặng: {{ "{:,}".format(((product_result.after_gift_price - product_result.G) * (product_result.sell_qty + product_result.gift_qty)) | int) }} VND</p>
         <input
           type="number"
           name="gift_value[]"
           required
           placeholder="Giá trị quà muốn tặng cho {{ product_result.product }}"
         />
-        <div class="button-group">
-          <button type="button" class="remove-btn" onclick="removeProductEntry(this)">Xóa</button>
-        </div>
       </div>
       {% endfor %}
-      <br/>
       <button type="submit">Tính hoa hồng</button>
     </form>
-
-    {% if result.products[0].commission_data %}
-    <div class="result-section">
-      <p>Tổng hoa hồng:</p>
-      <p>{{ "{:,}".format(result.total_commission | int) }} VND</p>
-    </div>
     {% endif %}
+    {% if result.total_commission > 0 %}
+    <div class="result-section">
+      <p>Tổng hoa hồng của tất cả sản phẩm được duyệt: {{ "{:,}".format(result.total_commission | int) }} VND</p>
+    </div>
     {% endif %}
     {% endif %}
 
@@ -393,6 +387,6 @@
         <button type="button">Reset</button>
       </a>
     </div>
-  </main>
+    </main>
 </body>
 </html>
