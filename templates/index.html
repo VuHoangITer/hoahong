@@ -346,6 +346,7 @@
         {% else %}
           KHÔNG DUYỆT
         {% endif %}
+    </div>
       </p>
     {% endfor %}
     {% if result.products|selectattr('approved')|list|length > 0 %}
@@ -369,9 +370,22 @@
     </form>
     {% endif %}
     {% if result.total_commission > 0 %}
-    <div class="result-section">
-      <p>Tổng hoa hồng của tất cả sản phẩm được duyệt: {{ "{:,}".format(result.total_commission | int) }} VND</p>
-    </div>
+<div class="result-section">
+  <p>Tổng hoa hồng của tất cả sản phẩm được duyệt: {{ "{:,}".format(result.total_commission | int) }} VND</p>
+  <form method="post" action="/download_pdf">
+    {% for product_result in result.products %}
+      <input type="hidden" name="product[]" value="{{ product_result.product }}">
+      <input type="hidden" name="sell_qty[]" value="{{ product_result.sell_qty }}">
+      <input type="hidden" name="gift_qty[]" value="{{ product_result.gift_qty }}">
+      <input type="hidden" name="after_gift_price[]" value="{{ product_result.after_gift_price | int }}">
+      <input type="hidden" name="approved[]" value="{{ product_result.approved }}">
+      <input type="hidden" name="commission[]" value="{{ product_result.commission_data.total_commission if product_result.commission_data else '' }}">
+    {% endfor %}
+    <input type="hidden" name="total_commission" value="{{ result.total_commission }}">
+    <button type="submit">📄 Tải PDF</button>
+  </form>
+</div>
+
     {% endif %}
     {% endif %}
 

@@ -1,4 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import io
+import os
+
 
 app = Flask(__name__)
 
@@ -144,6 +151,78 @@ def index():
         }
 
     return render_template('index.html', result=result)
+
+# Đăng ký font Unicode
+font_path = "DejaVuSans.ttf"
+if os.path.exists(font_path):
+    pdfmetrics.registerFont(TTFont("DejaVu", font_path))
+else:
+    raise FileNotFoundError("Thiếu file font DejaVuSans.ttf trong thư mục")
+
+@app.route('/download_pdf', methods=['POST'])
+def download_pdf():
+    products = request.form.getlist('product[]')
+    sell_quantities = request.form.getlist('sell_qty[]')
+    gift_quantities = request.form.getlist('gift_qty[]')
+    after_gift_prices = request.form.getlist('after_gift_price[]')
+    approved_list = request.form.getlist('approved[]')
+    total_commission = request.form.get('total_commission', '0')
+
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    y = height - 50
+    pdf.setFont("DejaVu", 16)  # ✅ font Unicode
+    pdf.drawString(200, y, "BÁO CÁO HOA HỒNG")
+    y -= 40
+
+    pdf.setFont("DejaVu", 12)
+    for i, product in enumerate(products):
+        pdf.drawString(50, y, f"Sản phẩm: {product}")
+        y -= 20
+        pdf.drawString(70, y, f"Số lượng bán: {sell_quantities[i]}, Số lượng tặng: {gift_quantities[i]}")
+        y -= 20
+
+        # ✅ Format giá sau tặng
+        try:
+            price = float(after_gift_prices[i])
+            price_str = "{:,.0f}₫".format(price)
+        except:
+            price_str = after_gift_prices[i]
+
+        pdf.drawString(70, y, f"Giá sau tặng: {price_str}")
+        y -= 20
+
+        pdf.drawString(70, y, f"Trạng thái: {'DUYỆT' if approved_list[i]=='True' else 'KHÔNG DUYỆT'}")
+        y -= 30
+
+        if y < 100:  # Xuống trang mới nếu hết chỗ
+            pdf.showPage()
+            y = height - 50
+            pdf.setFont("DejaVu", 12)
+
+    # ✅ Format tổng hoa hồng
+    try:
+        total_commission_val = float(total_commission)
+        total_commission_str = "{:,.0f}₫".format(total_commission_val)
+    except:
+        total_commission_str = total_commission
+
+    pdf.setFont("DejaVu", 13)
+    pdf.drawString(50, y, f"Tổng hoa hồng: {total_commission_str}")
+
+    pdf.save()
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="bao_cao_hoa_hong.pdf",
+        mimetype="application/pdf"
+    )
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
