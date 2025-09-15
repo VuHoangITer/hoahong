@@ -166,6 +166,8 @@ def download_pdf():
     gift_quantities = request.form.getlist('gift_qty[]')
     after_gift_prices = request.form.getlist('after_gift_price[]')
     approved_list = request.form.getlist('approved[]')
+    gift_values = request.form.getlist('gift_value[]')
+    funds = request.form.getlist('fund[]')
     total_commission = request.form.get('total_commission', '0')
 
     buffer = io.BytesIO()
@@ -173,7 +175,7 @@ def download_pdf():
     width, height = A4
 
     y = height - 50
-    pdf.setFont("DejaVu", 16)  # ✅ font Unicode
+    pdf.setFont("DejaVu", 16)
     pdf.drawString(200, y, "BÁO CÁO HOA HỒNG")
     y -= 40
 
@@ -181,7 +183,9 @@ def download_pdf():
     for i, product in enumerate(products):
         pdf.drawString(50, y, f"Sản phẩm: {product}")
         y -= 20
-        pdf.drawString(70, y, f"Số lượng bán: {sell_quantities[i]}, Số lượng tặng: {gift_quantities[i]}")
+        pdf.drawString(70, y, f"Số lượng bán: {sell_quantities[i]}")
+        y -= 20
+        pdf.drawString(70, y, f"Số lượng tặng: {gift_quantities[i]}")
         y -= 20
 
         # ✅ Format giá sau tặng
@@ -195,7 +199,26 @@ def download_pdf():
         y -= 20
 
         pdf.drawString(70, y, f"Trạng thái: {'DUYỆT' if approved_list[i]=='True' else 'KHÔNG DUYỆT'}")
-        y -= 30
+        y -= 20
+
+        # ✅ Quỹ quà tặng
+        try:
+            fund_val = float(funds[i])
+            fund_val_str = "{:,.0f}₫".format(fund_val)
+        except:
+            fund_val_str = funds[i] if i < len(funds) else "0"
+        pdf.drawString(70, y, f"Quỹ quà tặng: {fund_val_str}")
+        y -= 20
+
+        # ✅ Giá trị quà tặng khách
+        try:
+            gift_val = float(gift_values[i])
+            gift_val_str = "{:,.0f}₫".format(gift_val)
+            pdf.drawString(70, y, f"Giá trị quà tặng khách: {gift_val_str}")
+            y -= 40
+        except:
+            pass
+
 
         if y < 100:  # Xuống trang mới nếu hết chỗ
             pdf.showPage()
@@ -209,8 +232,13 @@ def download_pdf():
     except:
         total_commission_str = total_commission
 
-    pdf.setFont("DejaVu", 13)
-    pdf.drawString(50, y, f"Tổng hoa hồng: {total_commission_str}")
+    pdf.setFont("DejaVu", 14)
+    pdf.setFillColorRGB(1, 0, 0)  # 🔴 Đổi sang màu đỏ nổi bật
+
+    # ✅ Căn giữa
+    text = f"TỔNG HOA HỒNG: {total_commission_str}"
+    text_width = pdf.stringWidth(text, "DejaVu", 14)
+    pdf.drawString((width - text_width) / 2, y, text)
 
     pdf.save()
     buffer.seek(0)
