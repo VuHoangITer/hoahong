@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Web Tính Hoa Hồng</title>
+  <title>Hoa Hồng BRICON</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
@@ -326,7 +326,12 @@
 </head>
 <body>
   <main>
-    <h1>Web Tính Hoa Hồng</h1>
+    <div style="text-align:center; margin-bottom: 20px;">
+      <img src="{{ url_for('static', filename='logo.png') }}"
+           alt="Logo Bricon"
+           style="height: 80px; margin-bottom: 10px;">
+      <h1>Hoa Hồng</h1>
+    </div>
     <form method="post">
       <div id="product_entries"></div>
       <button type="submit">Check</button>
