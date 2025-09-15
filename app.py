@@ -187,19 +187,27 @@ def download_pdf():
     styles.add(ParagraphStyle(name="RightSmall", fontName="DejaVu", fontSize=9, alignment=2, textColor=colors.grey))
     styles.add(ParagraphStyle(name="RightBold", fontName="DejaVu", fontSize=11, alignment=2))
 
+    # ✅ style cho cell để tự xuống dòng
+    style_cell = ParagraphStyle(
+        name="CellStyle",
+        fontName="DejaVu",
+        fontSize=10,
+        leading=12,
+        alignment=0,     # căn trái để xuống dòng
+        wordWrap='CJK'   # tự động xuống dòng
+    )
+
     story = []
 
-    # 🔹 Header: Logo bên trái + ngày xuất báo cáo bên phải
+    # 🔹 Header: Logo + Ngày xuất báo cáo
     logo_path = os.path.join(app.root_path, "static", "logo.png")
     try:
-        logo = Image(logo_path, width=3.1*cm, height=0.8*cm)  # logo nhỏ lại
+        logo = Image(logo_path, width=3.1*cm, height=0.8*cm)
     except:
         logo = Paragraph("", styles["NormalVN"])
 
     today = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-    header_data = [
-        [logo, Paragraph(f"Ngày xuất báo cáo: {today}", styles["RightSmall"])]
-    ]
+    header_data = [[logo, Paragraph(f"Ngày xuất báo cáo: {today}", styles["RightSmall"])]]
     header_table = Table(header_data, colWidths=[4*cm, 12*cm])
     header_table.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
@@ -208,98 +216,103 @@ def download_pdf():
     story.append(header_table)
     story.append(Spacer(1, 10))
 
-    # 🔹 Tiêu đề căn giữa
+    # 🔹 Tiêu đề
     story.append(Paragraph("BÁO CÁO HOA HỒNG", styles["CenterTitle"]))
     story.append(Spacer(1, 12))
 
-    # 🔹 Chuẩn bị bảng dữ liệu
-    data = [["Sản phẩm", "SL Bán", "SL Tặng", "Giá sau tặng", "Trạng thái", "Quỹ quà tặng", "GT quà tặng"]]
+    # 🔹 Dữ liệu bảng
+    headers = ["Sản phẩm", "SL Bán", "SL Tặng", "Giá sau tặng",
+               "Trạng thái", "Quỹ quà tặng", "GT quà tặng", "Hoa hồng SP"]
+
+    data = [[Paragraph(h, style_cell) for h in headers]]
+    total_commission_all = 0
 
     for i, product in enumerate(products):
         try:
-            price = "{:,.0f}₫".format(float(after_gift_prices[i]))
-        except:
-            price = after_gift_prices[i]
+            sell_qty = int(sell_quantities[i])
+            gift_qty = int(gift_quantities[i])
+            total_qty = sell_qty + gift_qty
+            D = float(get_market_price(product))
+            G = float(get_price(product, sell_qty))
+            base_commission = get_base_commission(product)
 
-        try:
-            fund_val = "{:,.0f}₫".format(float(funds[i]))
-        except:
-            fund_val = funds[i] if i < len(funds) else "0"
+            F = (D * sell_qty) / total_qty if total_qty > 0 else 0
+            fund_val = (F - G) * total_qty
+            try:
+                gift_val = float(gift_values[i])
+            except:
+                gift_val = 0
 
-        try:
-            gift_val = "{:,.0f}₫".format(float(gift_values[i]))
-        except:
-            gift_val = gift_values[i] if i < len(gift_values) else "0"
+            commission_company = base_commission * sell_qty
+            commission_product = (fund_val - gift_val) + commission_company
+            total_commission_all += commission_product
 
-        status = "DUYỆT" if approved_list[i] == "True" else "KHÔNG DUYỆT"
+            price = "{:,.0f}₫".format(F)
+            fund_str = "{:,.0f}₫".format(fund_val)
+            gift_str = "{:,.0f}₫".format(gift_val)
+            commission_str = "{:,.0f}₫".format(commission_product)
+            status = "DUYỆT" if approved_list[i] == "True" else "KHÔNG DUYỆT"
 
-        data.append([
-            Paragraph(product, styles["NormalVN"]),
-            sell_quantities[i],
-            gift_quantities[i],
-            price,
-            status,
-            fund_val,
-            gift_val
-        ])
+            data.append([
+                Paragraph(product, style_cell),
+                Paragraph(str(sell_qty), style_cell),
+                Paragraph(str(gift_qty), style_cell),
+                Paragraph(price, style_cell),
+                Paragraph(status, style_cell),
+                Paragraph(fund_str, style_cell),
+                Paragraph(gift_str, style_cell),
+                Paragraph(commission_str, style_cell)
+            ])
 
-    # 🔹 Bảng dữ liệu
-    table = Table(data, repeatRows=1, colWidths=[5*cm, 2*cm, 2*cm, 3*cm, 3*cm, 3*cm, 3*cm])
+        except Exception as e:
+            print("Lỗi:", e)
+
+    # ✅ Thêm dòng tổng hoa hồng ngay trong bảng
+    data.append([
+        Paragraph("<b>TỔNG HOA HỒNG</b>", style_cell),
+        "", "", "", "", "", "",
+        Paragraph(f"<b>{total_commission_all:,.0f}₫</b>", style_cell)
+    ])
+
+    # 🔹 Bảng chính
+    col_widths = [3*cm, 2*cm, 2*cm, 2*cm, 2*cm, 3*cm, 3*cm, 3*cm]
+    table = Table(data, repeatRows=1, colWidths=col_widths)
     table.setStyle(TableStyle([
-        ('FONTNAME', (0,0), (-1,0), 'DejaVu'),
-        ('FONTSIZE', (0,0), (-1,0), 12),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#003366")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('ALIGN', (0,0), (-1,0), 'CENTER'),
-        ('FONTNAME', (0,1), (-1,-1), 'DejaVu'),
-        ('FONTSIZE', (0,1), (-1,-1), 11),
+        ('FONTNAME', (0,0), (-1,0), 'DejaVu'),
+        ('FONTSIZE', (0,0), (-1,0), 11),
         ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
-        ('ALIGN', (1,1), (-1,-1), 'CENTER'),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.whitesmoke, colors.lightgrey])
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('ROWBACKGROUNDS', (0,1), (-1,-2), [colors.whitesmoke, colors.lightgrey]),
+
+        # ✅ Dòng tổng hoa hồng
+        ('SPAN', (0,-1), (-2,-1)),  # gộp 7 cột đầu
+        ('BACKGROUND', (0,-1), (-1,-1), colors.lightgrey),
+        ('ALIGN', (0,-1), (-1,-1), 'CENTER'),  # căn giữa cả dòng tổng
+        ('FONTNAME', (0,-1), (-1,-1), 'DejaVu'),
+        ('FONTSIZE', (0,-1), (-1,-1), 12),
     ]))
     story.append(table)
-    story.append(Spacer(1, 20))
-
-    # 🔹 Tổng hoa hồng căn giữa (chuyên nghiệp)
-    try:
-        total_commission_val = float(total_commission)
-        total_commission_str = "{:,.0f}₫".format(total_commission_val)
-    except:
-        total_commission_str = str(total_commission)
-
-    summary_table = Table(
-        [[f"TỔNG HOA HỒNG: {total_commission_str}"]],
-        colWidths=[18 * cm]
-    )
-
-    summary_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f2f2f2")),  # nền xám nhạt tinh tế
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#333333")),  # chữ xám đậm
-        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'DejaVu'),  # chữ đậm
-        ('FONTSIZE', (0, 0), (-1, 0), 16),  # chữ lớn hơn
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('TOPPADDING', (0, 0), (-1, 0), 12),
-        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor("#999999")),
-    ]))
-    story.append(summary_table)
     story.append(Spacer(1, 30))
 
-    # 🔹 Footer: Người xét duyệt (trái) và Người lập báo cáo (phải)
+
+
+    # 🔹 Footer
     footer_data = [
         [
             Paragraph("Người xét duyệt", styles["NormalVN"]),
             Paragraph("Người lập báo cáo", styles["RightBold"])
         ]
     ]
-
     footer_table = Table(footer_data, colWidths=[8 * cm, 8 * cm])
     footer_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (0, 0), 'LEFT'),  # Người xét duyệt -> căn trái
-        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),  # Người lập báo cáo -> căn phải
-        ('FONTNAME', (0, 0), (-1, -1), 'DejaVu'),
-        ('FONTSIZE', (0, 0), (-1, -1), 11),
-        ('TOPPADDING', (0, 0), (-1, -1), 30),  # tạo khoảng trống để ký tên
+        ('ALIGN', (0,0), (0,0), 'LEFT'),
+        ('ALIGN', (1,0), (1,0), 'RIGHT'),
+        ('FONTNAME', (0,0), (-1,-1), 'DejaVu'),
+        ('FONTSIZE', (0,0), (-1,-1), 11),
+        ('TOPPADDING', (0,0), (-1,-1), 30),
     ]))
     story.append(footer_table)
 
