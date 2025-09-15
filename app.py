@@ -202,7 +202,7 @@ def download_pdf():
     # 🔹 Header: Logo + Ngày xuất báo cáo
     logo_path = os.path.join(app.root_path, "static", "logo.png")
     try:
-        logo = Image(logo_path, width=3.1*cm, height=0.8*cm)
+        logo = Image(logo_path, width=5.1*cm, height=1*cm)
     except:
         logo = Paragraph("", styles["NormalVN"])
 
@@ -275,7 +275,7 @@ def download_pdf():
     ])
 
     # 🔹 Bảng chính
-    col_widths = [3*cm, 2*cm, 2*cm, 2*cm, 2*cm, 3*cm, 3*cm, 3*cm]
+    col_widths = [3*cm, 2*cm, 2*cm, 2.2*cm, 2*cm, 3*cm, 3*cm, 3*cm]
     table = Table(data, repeatRows=1, colWidths=col_widths)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#003366")),
