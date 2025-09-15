@@ -1,9 +1,13 @@
 from flask import Flask, render_template, request, send_file
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, HRFlowable
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-import io
+import io,datetime
 import os
 
 
@@ -171,84 +175,144 @@ def download_pdf():
     total_commission = request.form.get('total_commission', '0')
 
     buffer = io.BytesIO()
-    pdf = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
+    doc = SimpleDocTemplate(
+        buffer, pagesize=A4,
+        leftMargin=2*cm, rightMargin=2*cm,
+        topMargin=2*cm, bottomMargin=2*cm
+    )
 
-    y = height - 50
-    pdf.setFont("DejaVu", 16)
-    pdf.drawString(200, y, "BÁO CÁO HOA HỒNG")
-    y -= 40
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name="CenterTitle", fontName="DejaVu", fontSize=18, alignment=1, spaceAfter=20))
+    styles.add(ParagraphStyle(name="NormalVN", fontName="DejaVu", fontSize=11, leading=14))
+    styles.add(ParagraphStyle(name="RightSmall", fontName="DejaVu", fontSize=9, alignment=2, textColor=colors.grey))
+    styles.add(ParagraphStyle(name="RightBold", fontName="DejaVu", fontSize=11, alignment=2))
 
-    pdf.setFont("DejaVu", 12)
+    story = []
+
+    # 🔹 Header: Logo bên trái + ngày xuất báo cáo bên phải
+    logo_path = os.path.join(app.root_path, "static", "logo.png")
+    try:
+        logo = Image(logo_path, width=3.1*cm, height=0.8*cm)  # logo nhỏ lại
+    except:
+        logo = Paragraph("", styles["NormalVN"])
+
+    today = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+    header_data = [
+        [logo, Paragraph(f"Ngày xuất báo cáo: {today}", styles["RightSmall"])]
+    ]
+    header_table = Table(header_data, colWidths=[4*cm, 12*cm])
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('ALIGN', (1,0), (1,0), 'RIGHT'),
+    ]))
+    story.append(header_table)
+    story.append(Spacer(1, 10))
+
+    # 🔹 Tiêu đề căn giữa
+    story.append(Paragraph("BÁO CÁO HOA HỒNG", styles["CenterTitle"]))
+    story.append(Spacer(1, 12))
+
+    # 🔹 Chuẩn bị bảng dữ liệu
+    data = [["Sản phẩm", "SL Bán", "SL Tặng", "Giá sau tặng", "Trạng thái", "Quỹ quà tặng", "GT quà tặng"]]
+
     for i, product in enumerate(products):
-        pdf.drawString(50, y, f"Sản phẩm: {product}")
-        y -= 20
-        pdf.drawString(70, y, f"Số lượng bán: {sell_quantities[i]}")
-        y -= 20
-        pdf.drawString(70, y, f"Số lượng tặng: {gift_quantities[i]}")
-        y -= 20
-
-        # ✅ Format giá sau tặng
         try:
-            price = float(after_gift_prices[i])
-            price_str = "{:,.0f}₫".format(price)
+            price = "{:,.0f}₫".format(float(after_gift_prices[i]))
         except:
-            price_str = after_gift_prices[i]
+            price = after_gift_prices[i]
 
-        pdf.drawString(70, y, f"Giá sau tặng: {price_str}")
-        y -= 20
-
-        pdf.drawString(70, y, f"Trạng thái: {'DUYỆT' if approved_list[i]=='True' else 'KHÔNG DUYỆT'}")
-        y -= 20
-
-        # ✅ Quỹ quà tặng
         try:
-            fund_val = float(funds[i])
-            fund_val_str = "{:,.0f}₫".format(fund_val)
+            fund_val = "{:,.0f}₫".format(float(funds[i]))
         except:
-            fund_val_str = funds[i] if i < len(funds) else "0"
-        pdf.drawString(70, y, f"Quỹ quà tặng: {fund_val_str}")
-        y -= 20
+            fund_val = funds[i] if i < len(funds) else "0"
 
-        # ✅ Giá trị quà tặng khách
         try:
-            gift_val = float(gift_values[i])
-            gift_val_str = "{:,.0f}₫".format(gift_val)
-            pdf.drawString(70, y, f"Giá trị quà tặng khách: {gift_val_str}")
-            y -= 40
+            gift_val = "{:,.0f}₫".format(float(gift_values[i]))
         except:
-            pass
+            gift_val = gift_values[i] if i < len(gift_values) else "0"
 
+        status = "DUYỆT" if approved_list[i] == "True" else "KHÔNG DUYỆT"
 
-        if y < 100:  # Xuống trang mới nếu hết chỗ
-            pdf.showPage()
-            y = height - 50
-            pdf.setFont("DejaVu", 12)
+        data.append([
+            Paragraph(product, styles["NormalVN"]),
+            sell_quantities[i],
+            gift_quantities[i],
+            price,
+            status,
+            fund_val,
+            gift_val
+        ])
 
-    # ✅ Format tổng hoa hồng
+    # 🔹 Bảng dữ liệu
+    table = Table(data, repeatRows=1, colWidths=[5*cm, 2*cm, 2*cm, 3*cm, 3*cm, 3*cm, 3*cm])
+    table.setStyle(TableStyle([
+        ('FONTNAME', (0,0), (-1,0), 'DejaVu'),
+        ('FONTSIZE', (0,0), (-1,0), 12),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#003366")),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('ALIGN', (0,0), (-1,0), 'CENTER'),
+        ('FONTNAME', (0,1), (-1,-1), 'DejaVu'),
+        ('FONTSIZE', (0,1), (-1,-1), 11),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+        ('ALIGN', (1,1), (-1,-1), 'CENTER'),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.whitesmoke, colors.lightgrey])
+    ]))
+    story.append(table)
+    story.append(Spacer(1, 20))
+
+    # 🔹 Tổng hoa hồng căn giữa (chuyên nghiệp)
     try:
         total_commission_val = float(total_commission)
         total_commission_str = "{:,.0f}₫".format(total_commission_val)
     except:
-        total_commission_str = total_commission
+        total_commission_str = str(total_commission)
 
-    pdf.setFont("DejaVu", 14)
-    pdf.setFillColorRGB(1, 0, 0)  # 🔴 Đổi sang màu đỏ nổi bật
+    summary_table = Table(
+        [[f"TỔNG HOA HỒNG: {total_commission_str}"]],
+        colWidths=[18 * cm]
+    )
 
-    # ✅ Căn giữa
-    text = f"TỔNG HOA HỒNG: {total_commission_str}"
-    text_width = pdf.stringWidth(text, "DejaVu", 14)
-    pdf.drawString((width - text_width) / 2, y, text)
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f2f2f2")),  # nền xám nhạt tinh tế
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#333333")),  # chữ xám đậm
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'DejaVu'),  # chữ đậm
+        ('FONTSIZE', (0, 0), (-1, 0), 16),  # chữ lớn hơn
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('TOPPADDING', (0, 0), (-1, 0), 12),
+        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor("#999999")),
+    ]))
+    story.append(summary_table)
+    story.append(Spacer(1, 30))
 
-    pdf.save()
+    # 🔹 Footer: Người xét duyệt (trái) và Người lập báo cáo (phải)
+    footer_data = [
+        [
+            Paragraph("Người xét duyệt", styles["NormalVN"]),
+            Paragraph("Người lập báo cáo", styles["RightBold"])
+        ]
+    ]
+
+    footer_table = Table(footer_data, colWidths=[8 * cm, 8 * cm])
+    footer_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),  # Người xét duyệt -> căn trái
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),  # Người lập báo cáo -> căn phải
+        ('FONTNAME', (0, 0), (-1, -1), 'DejaVu'),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('TOPPADDING', (0, 0), (-1, -1), 30),  # tạo khoảng trống để ký tên
+    ]))
+    story.append(footer_table)
+
+    doc.build(story)
+
     buffer.seek(0)
-
     return send_file(
         buffer,
         as_attachment=True,
         download_name="bao_cao_hoa_hong.pdf",
         mimetype="application/pdf"
     )
+
 
 
 
