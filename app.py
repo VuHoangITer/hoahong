@@ -7,6 +7,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, HRFlowable
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from zoneinfo import ZoneInfo
 import io,datetime
 import os
 
@@ -206,7 +207,7 @@ def download_pdf():
     except:
         logo = Paragraph("", styles["NormalVN"])
 
-    today = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+    today = datetime.datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%d/%m/%Y %H:%M")
     header_data = [[logo, Paragraph(f"Ngày xuất báo cáo: {today}", styles["RightSmall"])]]
     header_table = Table(header_data, colWidths=[4*cm, 12*cm])
     header_table.setStyle(TableStyle([
