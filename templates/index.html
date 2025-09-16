@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,32 +16,39 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
     }
     main {
-      max-width: 900px;
+      max-width: 1000px;
       width: 100%;
       background: #ffffff;
-      padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 6px 10px rgba(0, 0, 0, 0.05);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(8px);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header img {
+      height: 100px;
+      margin-bottom: 15px;
     }
     h1 {
-      text-align: center;
       color: #2b6cb0;
-      margin-bottom: 35px;
-      font-size: 2.5em;
+      font-size: 2.2em;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       position: relative;
+      margin: 0;
     }
     h1::after {
       content: '';
-      width: 50px;
-      height: 3px;
+      width: 60px;
+      height: 4px;
       background: #2b6cb0;
       position: absolute;
       bottom: -10px;
@@ -50,27 +57,24 @@
       border-radius: 2px;
     }
     .product-entry {
-      background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%);
+      background: #f9fafb;
       padding: 20px;
       border-radius: 12px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       border: 1px solid #e2e8f0;
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 45px;
+      align-items: center;
     }
     .product-entry:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    }
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     }
     select, input[type="number"] {
       width: 100%;
-      padding: 14px;
-      margin-bottom: 15px;
+      padding: 12px;
       border: 2px solid #edf2f7;
       border-radius: 8px;
       font-size: 1em;
@@ -81,26 +85,24 @@
     select:focus, input:focus {
       outline: none;
       border-color: #4a90e2;
-      box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
       background: #f7fafc;
     }
     button {
-      padding: 16px 30px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 10px;
-      font-size: 1.1em;
+      border-radius: 8px;
+      font-size: 1em;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      display: inline-block;
-      margin: 10px 0;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
     }
     .button-group {
       display: flex;
       justify-content: flex-end;
-      gap: 15px;
+      gap: 10px;
     }
     button[type="button"] {
       background: linear-gradient(90deg, #4a5568, #2d3748);
@@ -122,7 +124,7 @@
       background: linear-gradient(90deg, #2b6cb0, #4a90e2);
       color: #fff;
       width: 100%;
-      margin-top: 20px;
+      padding: 15px;
     }
     button[type="submit"]:hover {
       background: linear-gradient(90deg, #4a90e2, #2b6cb0);
@@ -132,92 +134,102 @@
       background: linear-gradient(90deg, #38b2ac, #319795);
       color: #fff;
       width: 100%;
-      margin-top: 20px;
+      padding: 15px;
     }
     #add-product-btn:hover {
       background: linear-gradient(90deg, #319795, #38b2ac);
       transform: translateY(-2px);
     }
-    #after_gift_container {
+    .after-gift-container {
       display: none;
       align-items: center;
-      gap: 12px;
-      margin-top: 15px;
+      gap: 10px;
       font-size: 0.95em;
       color: #4a5568;
       background: #f7fafc;
-      padding: 10px;
+      padding: 8px 12px;
       border-radius: 6px;
     }
-    #after_gift_box {
+    .after-gift-box {
       font-weight: 600;
       color: #2b6cb0;
     }
     .result-section {
-      margin-top: 25px;
-      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+      padding: 10px;
       border-radius: 12px;
-      background: linear-gradient(145deg, #e6f0fa 0%, #f0f4f8 100%);
+      background: #f0f4f8;
       border: 1px solid #e2e8f0;
     }
-    .result-section p {
-      margin: 8px 0;
-      font-size: 1.1em;
+    .product-item {
+      background: #edf2f7;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
     }
-    .error {
+    .product-item h3 {
+      color: #2b6cb0;
+      font-size: 1.2em;
+      margin: 0 0 10px;
+    }
+    .product-item p {
+      margin: 5px 0;
+      font-size: 0.95em;
+    }
+    .product-item .approved {
+      color: #48bb78;
+      font-weight: 600;
+    }
+    .product-item .not-approved {
       color: #e53e3e;
       font-weight: 600;
-      text-align: center;
-      background: #fef2f2;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-    .approved {
-      color: #48bb78;
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-    .not-approved {
-      color: #e53e3e;
-      font-weight: bold;
-      font-size: 1.2em;
     }
     hr {
       border: none;
       border-top: 2px dashed #e2e8f0;
-      margin: 25px 0;
+      margin: 20px 0;
     }
     .reset-btn {
       display: block;
-      width: 180px;
-      margin: 25px auto;
+      width: 200px;
+      margin: 20px auto;
       text-align: center;
     }
     .reset-btn button {
       background: linear-gradient(90deg, #a0aec0, #718096);
       color: #fff;
+      width: 100%;
+      padding: 12px;
     }
     .reset-btn button:hover {
       background: linear-gradient(90deg, #718096, #a0aec0);
       transform: translateY(-2px);
     }
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       main {
         padding: 20px;
+      }
+      .header img {
+        height: 80px;
       }
       h1 {
         font-size: 1.8em;
       }
-      .button-group {
-        flex-direction: column;
+      .product-entry {
+        grid-template-columns: 1fr;
         gap: 10px;
+      }
+      .button-group {
+        justify-content: center;
       }
       button {
         width: 100%;
       }
-      #add-product-btn {
-        margin-top: 15px;
+      .result-section {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -230,7 +242,6 @@
       const afterGiftContainer = document.getElementById(`after_gift_container_${index}`);
       const sellInput = document.getElementsByName('sell_qty[]')[index];
 
-      // Set minimum quantity based on product
       if (product.includes("KCR")) {
         sellInput.setAttribute('min', '5');
       } else {
@@ -249,7 +260,7 @@
       const total = sellQty + giftQty;
       if (giftQty > 0 && total > 0) {
         const afterGift = (D * sellQty) / total;
-        afterGiftBox.innerText = Math.floor(afterGift).toLocaleString("vi-VN") + ' VND';
+        afterGiftBox.innerText = Math.floor(afterGift).toLocaleString("vi-VN") + '₫';
         afterGiftContainer.style.display = 'flex';
       } else {
         afterGiftContainer.style.display = 'none';
@@ -262,41 +273,35 @@
       const entry = document.createElement('div');
       entry.className = 'product-entry';
       entry.innerHTML = `
-        <div>
-          <select name="product[]" onchange="updateAfterGiftPrice(${index})">
-            <option value="KDG XÁM PHỔ THÔNG">KDG XÁM PHỔ THÔNG</option>
-            <option value="KDG TRẮNG PHỔ THÔNG">KDG TRẮNG PHỔ THÔNG</option>
-            <option value="KDG XÁM EXTRA">KDG XÁM EXTRA</option>
-            <option value="KDG TRẮNG EXTRA">KDG TRẮNG EXTRA</option>
-            <option value="KCR TRẮNG PHỔ THÔNG (BỊCH)">KCR TRẮNG PHỔ THÔNG (BỊCH)</option>
-            <option value="KCR TRẮNG EXTRA (BỊCH)">KCR TRẮNG EXTRA (BỊCH)</option>
-            <option value="KCR TRẮNG HỘP">KCR TRẮNG HỘP</option>
-          </select>
-        </div>
-        <div>
-          <input
-            type="number"
-            name="sell_qty[]"
-            placeholder="Số lượng bán"
-            required
-            min="10"
-            oninput="updateAfterGiftPrice(${index})"
-          />
-        </div>
-        <div>
-          <input
-            type="number"
-            name="gift_qty[]"
-            placeholder="Số lượng tặng"
-            required
-            oninput="updateAfterGiftPrice(${index})"
-          />
-        </div>
-        <div id="after_gift_container_${index}" style="display: none;">
-          <span>Giá sau tặng:</span>
-          <span id="after_gift_box_${index}"></span>
-        </div>
+        <select name="product[]" onchange="updateAfterGiftPrice(${index})">
+          <option value="KDG XÁM PHỔ THÔNG">KDG XÁM PHỔ THÔNG</option>
+          <option value="KDG TRẮNG PHỔ THÔNG">KDG TRẮNG PHỔ THÔNG</option>
+          <option value="KDG XÁM EXTRA">KDG XÁM EXTRA</option>
+          <option value="KDG TRẮNG EXTRA">KDG TRẮNG EXTRA</option>
+          <option value="KCR TRẮNG PHỔ THÔNG (BỊCH)">KCR TRẮNG PHỔ THÔNG (BỊCH)</option>
+          <option value="KCR TRẮNG EXTRA (BỊCH)">KCR TRẮNG EXTRA (BỊCH)</option>
+          <option value="KCR TRẮNG HỘP">KCR TRẮNG HỘP</option>
+        </select>
+        <input
+          type="number"
+          name="sell_qty[]"
+          placeholder="Số lượng bán"
+          required
+          min="10"
+          oninput="updateAfterGiftPrice(${index})"
+        />
+        <input
+          type="number"
+          name="gift_qty[]"
+          placeholder="Số lượng tặng"
+          required
+          oninput="updateAfterGiftPrice(${index})"
+        />
         <div class="button-group">
+          <div id="after_gift_container_${index}" class="after-gift-container">
+            <span>Giá sau tặng:</span>
+            <span id="after_gift_box_${index}" class="after-gift-box"></span>
+          </div>
           <button type="button" class="remove-btn" onclick="removeProductEntry(this)">Xóa</button>
         </div>
       `;
@@ -326,34 +331,30 @@
 </head>
 <body>
   <main>
-    <div style="text-align:center; margin-bottom: 20px;">
-      <img src="{{ url_for('static', filename='logo.png') }}"
-           alt="Logo Bricon"
-           style="height: 80px; margin-bottom: 10px;">
+    <div class="header">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Bricon">
       <h1>Hoa Hồng</h1>
     </div>
     <form method="post">
       <div id="product_entries"></div>
-      <button type="submit">Check</button>
+      <button type="submit">Kiểm tra</button>
     </form>
+    </br>
     <button type="button" id="add-product-btn" onclick="addProductEntry()">Thêm sản phẩm</button>
 
     {% if result %}
     <hr />
-    {% for product_result in result.products %}
     <div class="result-section">
-      <h3>{{ product_result.product }}</h3>
-      <p>Giá sau tặng: {{ "{:,}".format(product_result.after_gift_price | int) }} VND</p>
-      <p>Quyết định của sếp:</p>
-      <p class="{% if product_result.approved %}approved{% else %}not-approved{% endif %}">
-        {% if product_result.approved %}
-          DUYỆT
-        {% else %}
-          KHÔNG DUYỆT
-        {% endif %}
+      {% for product_result in result.products %}
+      <div class="product-item">
+        <h3>{{ product_result.product }}</h3>
+        <p>Giá sau tặng: {{ "{:,}".format(product_result.after_gift_price | int) }}₫</p>
+        <p>Quyết định của sếp: <span class="{% if product_result.approved %}approved{% else %}not-approved{% endif %}">
+          {% if product_result.approved %}DUYỆT{% else %}KHÔNG DUYỆT{% endif %}
+        </span></p>
+      </div>
+      {% endfor %}
     </div>
-      </p>
-    {% endfor %}
     {% if result.products|selectattr('approved')|list|length > 0 %}
     <form method="post">
       {% for product_result in result.products if product_result.approved %}
@@ -362,7 +363,7 @@
         <input type="hidden" name="product[]" value="{{ product_result.product }}">
         <input type="hidden" name="sell_qty[]" value="{{ product_result.sell_qty }}">
         <input type="hidden" name="gift_qty[]" value="{{ product_result.gift_qty }}">
-        <p>Quỹ quà tặng: {{ "{:,}".format(((product_result.after_gift_price - product_result.G) * (product_result.sell_qty + product_result.gift_qty)) | int) }} VND</p>
+        <p>Quỹ quà tặng: {{ "{:,}".format(((product_result.after_gift_price - product_result.G) * (product_result.sell_qty + product_result.gift_qty)) | int) }}₫</p>
         <input
           type="number"
           name="gift_value[]"
@@ -375,30 +376,28 @@
     </form>
     {% endif %}
     {% if result.total_commission > 0 %}
-<div class="result-section">
-  <p>Tổng hoa hồng của tất cả sản phẩm được duyệt: {{ "{:,}".format(result.total_commission | int) }} VND</p>
-<form method="post" action="/download_pdf">
-  {% for product_result in result.products %}
-    <input type="hidden" name="product[]" value="{{ product_result.product }}">
-    <input type="hidden" name="sell_qty[]" value="{{ product_result.sell_qty }}">
-    <input type="hidden" name="gift_qty[]" value="{{ product_result.gift_qty }}">
-    <input type="hidden" name="after_gift_price[]" value="{{ product_result.after_gift_price | int }}">
-    <input type="hidden" name="approved[]" value="{{ product_result.approved }}">
-    <input type="hidden" name="G[]" value="{{ product_result.G }}">
-    {% if product_result.commission_data %}
-      <input type="hidden" name="gift_value[]" value="{{ product_result.commission_data.gift_value }}">
-     <input type="hidden" name="fund[]" value="{{ product_result.commission_data.fund }}">
-    {% else %}
-      <input type="hidden" name="gift_value[]" value="0">
-      <input type="hidden" name="fund[]" value="0">
-    {% endif %}
-  {% endfor %}
-  <input type="hidden" name="total_commission" value="{{ result.total_commission }}">
-  <button type="submit">📄 Tải PDF</button>
-</form>
-
-</div>
-
+    <div class="result-section">
+      <p>Tổng hoa hồng: {{ "{:,}".format(result.total_commission | int) }}₫</p>
+      <form method="post" action="/download_pdf">
+        {% for product_result in result.products %}
+        <input type="hidden" name="product[]" value="{{ product_result.product }}">
+        <input type="hidden" name="sell_qty[]" value="{{ product_result.sell_qty }}">
+        <input type="hidden" name="gift_qty[]" value="{{ product_result.gift_qty }}">
+        <input type="hidden" name="after_gift_price[]" value="{{ product_result.after_gift_price | int }}">
+        <input type="hidden" name="approved[]" value="{{ product_result.approved }}">
+        <input type="hidden" name="G[]" value="{{ product_result.G }}">
+        {% if product_result.commission_data %}
+        <input type="hidden" name="gift_value[]" value="{{ product_result.commission_data.gift_value }}">
+        <input type="hidden" name="fund[]" value="{{ product_result.commission_data.fund }}">
+        {% else %}
+        <input type="hidden" name="gift_value[]" value="0">
+        <input type="hidden" name="fund[]" value="0">
+        {% endif %}
+        {% endfor %}
+        <input type="hidden" name="total_commission" value="{{ result.total_commission }}">
+        <button type="submit">📄 Tải PDF</button>
+      </form>
+    </div>
     {% endif %}
     {% endif %}
 
@@ -408,12 +407,9 @@
     </div>
     {% endif %}
 
-    <br/>
-    <div>
-      <a href="/" class="reset-btn">
-        <button type="button">Reset</button>
-      </a>
+    <div class="reset-btn">
+      <a href="/"><button type="button">Reset</button></a>
     </div>
-    </main>
+  </main>
 </body>
 </html>
