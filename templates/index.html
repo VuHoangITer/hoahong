@@ -327,6 +327,17 @@
     window.onload = function() {
       addProductEntry();
     };
+      function validateGiftValue(input, maxFund) {
+    const errorMsg = input.nextElementSibling;
+    const value = parseInt(input.value) || 0;
+    if (value > maxFund) {
+      errorMsg.style.display = "inline";
+      input.setCustomValidity("Giá trị quà vượt quá quỹ cho phép");
+    } else {
+      errorMsg.style.display = "none";
+      input.setCustomValidity("");
+    }
+  }
   </script>
 </head>
 <body>
@@ -363,13 +374,18 @@
         <input type="hidden" name="product[]" value="{{ product_result.product }}">
         <input type="hidden" name="sell_qty[]" value="{{ product_result.sell_qty }}">
         <input type="hidden" name="gift_qty[]" value="{{ product_result.gift_qty }}">
-        <p>Quỹ quà tặng: {{ "{:,}".format(((product_result.after_gift_price - product_result.G) * (product_result.sell_qty + product_result.gift_qty)) | int) }}₫</p>
+        <p>
+          Quỹ quà tặng:
+          {{ "{:,}".format(((product_result.after_gift_price - product_result.G) * (product_result.sell_qty + product_result.gift_qty)) | int) }}₫
+        </p>
         <input
           type="number"
           name="gift_value[]"
           required
           placeholder="Giá trị quà muốn tặng cho sản phẩm"
+          oninput="validateGiftValue(this, {{ ((product_result.after_gift_price - product_result.G) * (product_result.sell_qty + product_result.gift_qty)) | int }})"
         />
+        <span class="error-message" style="color:red; font-size:0.9em; display:none;">❌ Giá trị quà vượt quá quỹ!</span>
       </div>
       {% endfor %}
       <button type="submit">Tính hoa hồng</button>
