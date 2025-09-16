@@ -268,7 +268,7 @@ def download_pdf():
         except Exception as e:
             print("Lỗi:", e)
 
-    # ✅ Thêm dòng tổng hoa hồng ngay trong bảng
+    # Thêm dòng tổng hoa hồng ngay trong bảng
     data.append([
         Paragraph("<b>TỔNG HOA HỒNG</b>", style_cell),
         "", "", "", "", "", "",
@@ -279,7 +279,7 @@ def download_pdf():
     col_widths = [3*cm, 2*cm, 2*cm, 2.2*cm, 2*cm, 3*cm, 3*cm, 3*cm]
     table = Table(data, repeatRows=1, colWidths=col_widths)
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#003366")),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#d8e806")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('ALIGN', (0,0), (-1,0), 'CENTER'),
         ('FONTNAME', (0,0), (-1,0), 'DejaVu'),
